@@ -58,6 +58,16 @@
 #include "wiced_transport.h"
 #include "GeneratedSource/cycfg_gatt_db.h"
 
+#ifdef BTSTACK_VER
+#include "wiced_bt_gatt.h"
+#include "wiced_memory.h"
+#define BT_STACK_HEAP_SIZE          1024 * 6
+#define MULTI_ADV_TX_POWER_MAX      MULTI_ADV_TX_POWER_MAX_INDEX
+wiced_bt_heap_t *p_default_heap = NULL;
+wiced_bt_db_hash_t headset_db_hash;
+#else
+extern const wiced_bt_cfg_buf_pool_t wiced_bt_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS];
+#endif
 /*******************************************************************
  * Function Prototypes
  ******************************************************************/
@@ -80,11 +90,20 @@ const wiced_transport_cfg_t transport_cfg =
             .baud_rate =  HCI_UART_DEFAULT_BAUD
         },
     },
+#ifdef NEW_DYNAMIC_MEMORY_INCLUDED
+    .heap_config =
+    {
+        .data_heap_size = 1024 * 4 + 1500 * 2,
+        .hci_trace_heap_size = 1024 * 2,
+        .debug_trace_heap_size = 1024,
+    },
+#else
     .rx_buff_pool_cfg =
     {
         .buffer_size = 0,
         .buffer_count = 0
     },
+#endif
     .p_status_handler = NULL,
     .p_data_handler = NULL,
     .p_tx_complete_cback = NULL
@@ -125,7 +144,18 @@ APPLICATION_START()
     /* TODO your app init code */
 
     /* Initialize Stack and Register Management Callback */
+#ifdef BTSTACK_VER
+    /* Create default heap */
+    p_default_heap = wiced_bt_create_heap("default_heap", NULL, BT_STACK_HEAP_SIZE, NULL, WICED_TRUE);
+    if (p_default_heap == NULL)
+    {
+        WICED_BT_TRACE("create default heap error: size %d\n", BT_STACK_HEAP_SIZE);
+        return;
+    }
+    wiced_bt_stack_init(app_bt_management_callback, &wiced_bt_cfg_settings);
+#else
     wiced_bt_stack_init(app_bt_management_callback, &wiced_bt_cfg_settings, wiced_bt_cfg_buf_pools);
+#endif
 }
 
 /*************************************************************************************************
