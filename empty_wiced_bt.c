@@ -57,6 +57,9 @@
 #include "wiced_bt_stack.h"
 #include "wiced_transport.h"
 #include "GeneratedSource/cycfg_gatt_db.h"
+#if BTSTACK_VER >= 0x03000001
+#include "cycfg_gap.h"
+#endif
 
 #ifdef BTSTACK_VER
 #include "wiced_bt_gatt.h"
@@ -90,7 +93,7 @@ const wiced_transport_cfg_t transport_cfg =
             .baud_rate =  HCI_UART_DEFAULT_BAUD
         },
     },
-#ifdef NEW_DYNAMIC_MEMORY_INCLUDED
+#if BTSTACK_VER >= 0x03000001
     .heap_config =
     {
         .data_heap_size = 1024 * 4 + 1500 * 2,
@@ -249,7 +252,9 @@ wiced_result_t app_bt_management_callback( wiced_bt_management_evt_t event, wice
 /* TODO Set advertisement data for your application
 wiced_result_t app_set_advertisement_data(void)
 {
-
+#if BTSTACK_VER >= 0x03000001
+    return wiced_bt_ble_set_raw_advertisement_data(CY_BT_ADV_PACKET_DATA_SIZE, cy_bt_adv_packet_data);
+#else
     wiced_bt_ble_advert_elem_t  adv_elem[3];
     wiced_result_t              result;
     uint8_t         num_elem                = 0;
@@ -269,48 +274,6 @@ wiced_result_t app_set_advertisement_data(void)
     result = wiced_bt_ble_set_raw_advertisement_data(num_elem, adv_elem);
 
     return result;
-}
-*/
-
-/* TODO Handle GATT event callbacks if needed by your app
-wiced_bt_gatt_status_t app_gatt_callback( wiced_bt_gatt_evt_t event, wiced_bt_gatt_event_data_t *p_data )
-{
-    wiced_bt_gatt_status_t status = WICED_BT_GATT_SUCCESS;
-    wiced_bt_gatt_attribute_request_t *p_attr_req = &p_event_data->attribute_request;
-    wiced_bt_gatt_connection_status_t *p_conn_status = &p_data->connection_status;
-
-    switch( event )
-    {
-        case GATT_CONNECTION_STATUS_EVT:
-        {
-            if (p_conn_status->connected) // Device has connected
-            {
-            }
-            else // Device has disconnected
-            {
-            }
-        }
-            break;
-
-        case GATT_ATTRIBUTE_REQUEST_EVT:
-        {
-            switch (p_attr_req->request_type)
-            {
-            case GATTS_REQ_TYPE_READ: // read request
-               break;
-
-            case GATTS_REQ_TYPE_WRITE: // write request
-               break;
-
-            case GATTS_REQ_TYPE_CONF: // confirm request
-               break;
-            }
-        }
-            break;
-
-        default:
-            break;
-    }
-    return status;
+#endif
 }
 */
