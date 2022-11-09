@@ -116,7 +116,7 @@ const wiced_transport_cfg_t transport_cfg =
 * Function Name: void application_start(void)
 ********************************************************************************
 * Summary: Entry point to the application. Initialize transport configuration
-*          and register BLE management event callback. The actual application
+*          and register LE management event callback. The actual application
 *          initialization will happen when stack reports that BT device is ready
 *
 * Parameters:
@@ -167,11 +167,11 @@ APPLICATION_START()
 **************************************************************************************************
 * Summary:
 *   This is a Bluetooth stack management event handler function to receive events from
-*   BLE stack and process as per the application.
+*   LE stack and process as per the application.
 *
 * Parameters:
-*   wiced_bt_management_evt_t event             : BLE event code of one byte length
-*   wiced_bt_management_evt_data_t *p_event_data: Pointer to BLE management event structures
+*   wiced_bt_management_evt_t event             : LE event code of one byte length
+*   wiced_bt_management_evt_data_t *p_event_data: Pointer to LE management event structures
 *
 * Return:
 *  wiced_result_t: Error code from WICED_RESULT_LIST or BT_RESULT_LIST
