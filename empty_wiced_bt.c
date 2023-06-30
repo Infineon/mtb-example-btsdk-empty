@@ -71,6 +71,11 @@ wiced_bt_db_hash_t headset_db_hash;
 #else
 extern const wiced_bt_cfg_buf_pool_t wiced_bt_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS];
 #endif
+
+#if defined(CYW43022C1)
+void debug_uart_set_baudrate(uint32_t baud_rate);
+#endif
+
 /*******************************************************************
  * Function Prototypes
  ******************************************************************/
@@ -93,7 +98,7 @@ const wiced_transport_cfg_t transport_cfg =
             .baud_rate =  HCI_UART_DEFAULT_BAUD
         },
     },
-#if BTSTACK_VER >= 0x03000001
+#ifdef NEW_DYNAMIC_MEMORY_INCLUDED
     .heap_config =
     {
         .data_heap_size = 1024 * 4 + 1500 * 2,
@@ -135,10 +140,23 @@ APPLICATION_START()
 #ifdef NO_PUART_SUPPORT
     wiced_set_debug_uart(  WICED_ROUTE_DEBUG_TO_WICED_UART );
 #else
-    wiced_set_debug_uart(  WICED_ROUTE_DEBUG_TO_PUART );
+#if defined(CYW43022C1)
+      // 43022 transport clock rate is 24Mhz for baud rates <= 1.5 Mbit/sec, and 48Mhz for baud rates > 1.5 Mbit/sec.
+    // HCI UART and Debug UART both use the Transport clock, so if the HCI UART rate is <= 1.5 Mbps, please do not set the Debug UART > 1.5 Mbps.
+    // The default Debug UART baud rate is 115200, and default HCI UART baud rate is 3Mbps
+    debug_uart_set_baudrate(115200);
+
+    // CYW943022M2BTBGA doesn't have GPIO pin for PUART.
+    // CYW943022M2BTBGA Debug UART Tx (WICED_GPIO_02) is connected to UART2_RX (ARD_D1) on PUART Level Translators of CYW9BTM2BASE1.
+    // We need to set to WICED_ROUTE_DEBUG_TO_DBG_UART to see traces on PUART of CYW9BTM2BASE1.
+    wiced_set_debug_uart( WICED_ROUTE_DEBUG_TO_DBG_UART );
+#else
+    // Set to PUART to see traces on peripheral uart(puart)
+    wiced_set_debug_uart( WICED_ROUTE_DEBUG_TO_PUART );
 #ifdef CYW20706A2
     wiced_hal_puart_select_uart_pads( WICED_PUART_RXD, WICED_PUART_TXD, 0, 0);
 #endif // CYW20706A2
+#endif // CYW43022C1
 #endif // NO_PUART_SUPPORT
 #endif // WICED_BT_TRACE_ENABLE
 

@@ -47,7 +47,7 @@
 #include <cycfg_gap.h>
 #include "wiced_bt_cfg.h"
 
-// The file is for BTSTACK version 3.0 or higher, chips such as 55572A1
+// The file is for BTSTACK version 3.0 or higher, chips such as 55572A1 or 43022C1
 /* TODO - Set your app settings as per use case */
 
 /* BR Setting */

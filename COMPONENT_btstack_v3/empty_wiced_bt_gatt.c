@@ -31,7 +31,7 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-// for stack version 3.0, example 55572A1
+// for stack version 3.0, example 55572A1 or 43022C1
 
 /* TODO Handle GATT event callbacks if needed by your app
 
